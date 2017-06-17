@@ -31,7 +31,7 @@ public class GerenciadorActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        i = new Intent(getApplicationContext(), MainActivity.class);
+                        i = new Intent(getApplicationContext(), MesasActivity.class);
                         startActivity(i);
                         break;
                     case 1:

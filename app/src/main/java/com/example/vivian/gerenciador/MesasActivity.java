@@ -1,0 +1,130 @@
+package com.example.vivian.gerenciador;
+
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.example.vivian.gerenciador.adaptadores.MesaAdapter;
+import com.example.vivian.gerenciador.classes.Mesa;
+import com.example.vivian.gerenciador.conexao_network.Conexao;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MesasActivity extends AppCompatActivity {
+
+    //private ListView lvMesas;
+    //private SwipeMenuListView lvMeusPedidos;
+    private MesaAdapter adapter;
+    private List<Mesa> lMesas;
+    //private Mesa oMesa;
+    private ListView lvMesas;
+    private String sIdUser = "";
+    private static final String TAG = "MesasActivity";
+    String url = "", parametros = "";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_mesas);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+        //sIdUser = getIntent().getStringExtra("idusuario").toString();
+
+        InicializarComponentes();
+
+        lMesas = new ArrayList<>();
+        try {
+            //Verificação da rede
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if(networkInfo != null && networkInfo.isConnected()) {
+                url = "http://apppedglace.xyz/login/cadastro/mesas/lista_mesas.php";
+                parametros = "usuario=" + sIdUser;
+                new MesasActivity.SolicitaDados().execute(url);
+            } else {
+                Toast.makeText(getApplicationContext(), "Você não está conectado à rede", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        lvMesas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent i = new Intent(MesasActivity.this, ComandasActivity.class);
+                startActivity(i);
+            }
+        });
+    }
+
+    private void InicializarComponentes() {
+        lvMesas = (ListView) findViewById(R.id.lvMesas);
+    }
+
+    private class SolicitaDados extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            return Conexao.postDados(params[0], parametros);
+        }
+
+        @Override
+        protected void onPostExecute(String resultado) {
+            if(resultado.length() > 0) {
+                Toast.makeText(getApplicationContext(), "Carregando...", Toast.LENGTH_LONG).show();
+
+                try {
+                    JSONArray jArray = new JSONArray(resultado);
+                    JSONObject jObj = null;
+
+                    lMesas.clear();
+
+                    for(int i = 0; i < jArray.length(); i++) {
+                        jObj = jArray.getJSONObject(i);
+
+                        String cod = jObj.getString("codigo");
+                        String id = jObj.getString("idmesas");
+                        String qtdLugares = jObj.getString("qtd_lugares");
+
+                        lMesas.add(new Mesa(cod, Integer.parseInt(id), Integer.parseInt(qtdLugares)));
+
+                    }
+                    if(lMesas.size() > 0) {
+                        adapter = new MesaAdapter(getApplicationContext(), lMesas);
+                        lvMesas.setAdapter(adapter);
+                    } else
+                        Toast.makeText(getApplicationContext(), "Nenhuma mesa cadastrada.", Toast.LENGTH_LONG).show();
+
+                } catch (Exception ex) {
+                    Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                }
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Erro ao listar Mesas.", Toast.LENGTH_LONG).show();
+            }
+        }
+
+
+    }
+
+}
