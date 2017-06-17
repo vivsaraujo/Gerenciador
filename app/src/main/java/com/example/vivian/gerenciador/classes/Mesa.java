@@ -6,6 +6,10 @@ public class Mesa {
     private int iQtdPessoas;
     private String sMesa;
 
+    public Mesa(String sMesa) {
+        this.sMesa = sMesa;
+    }
+
     public Mesa(String sMesa, int iId, int iQtdPessoas) {
         this.sMesa = sMesa;
         this.iId = iId;

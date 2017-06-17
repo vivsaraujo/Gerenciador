@@ -20,32 +20,37 @@ import java.util.List;
 public class Mesas extends Fragment {
 
     private MesaAdapter adapter;
-    private List<Mesa> lista = new ArrayList<>();
+    private List<Mesa> lista;
     private ListView lvMesas;
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        lista = getLista();
         lvMesas = (ListView) container.findViewById(R.id.lvMesas);
-
-        lista.add(new Mesa("001", 1, 0));
-        lista.add(new Mesa("002", 2, 0));
-        lista.add(new Mesa("003", 3, 1));
-        lista.add(new Mesa("004", 4, 4));
-        lista.add(new Mesa("005", 5, 4));
-        lista.add(new Mesa("006", 6, 2));
-        lista.add(new Mesa("007", 7, 0));
-        lista.add(new Mesa("008", 8, 0));
-        lista.add(new Mesa("009", 9, 0));
-        lista.add(new Mesa("010", 10, 4));
-
         adapter = new MesaAdapter(getActivity(), lista);
         lvMesas.setAdapter(adapter);
-
 
         return inflater.inflate(R.layout.tab_mesa, container, false);
 
     }
+
+    public List<Mesa> getLista() {
+
+        lista = new ArrayList<>();
+
+        lista.add(new Mesa("001"));
+        lista.add(new Mesa("002"));
+        lista.add(new Mesa("003"));
+        lista.add(new Mesa("004"));
+        lista.add(new Mesa("005"));
+        lista.add(new Mesa("006"));
+        lista.add(new Mesa("007"));
+        lista.add(new Mesa("008"));
+        lista.add(new Mesa("009"));
+        lista.add(new Mesa("010"));
+
+        return lista;
+    }
 }
+
